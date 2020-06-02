@@ -20,6 +20,8 @@ setuptools.setup(
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
-    scripts=['bin/seeing'],
+    entry_points={
+        'console_scripts': ['seeing = seeing:main']
+    },
     python_requires='>=3.6',
 )
