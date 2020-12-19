@@ -5,7 +5,7 @@ filename endswith .py .c .cpp .go
 """
 
 __author__ = 'Mikele'
-__version__ = '0.1.6'
+__version__ = '0.1.7'
 
 import argparse
 import os, time, logging, sys
@@ -43,7 +43,7 @@ def watch_dev(root):
                 watch_dev(new_name)
 
 
-def run_command(filename):
+def run_command(filename, command):
     '''run switch file tail'''
     if filename.endswith('.cpp'):
         cmd = "g++ {} && ./a.out"
@@ -54,7 +54,7 @@ def run_command(filename):
     elif filename.endswith('.go'):
         # os.environ.setdefault('GOPATH', os.getcwd())
         cmd = "go run {}"
-    elif args.cmd:
+    elif command:
         cmd = ' '.join(sys.argv[2:])
         print(sys.argv)
     if isfile(filename):
@@ -81,14 +81,14 @@ def monitor_file_modify_every(seconds, filename, command, dirname):
     fork = None
     if filename:
         st = os.stat(filename).st_mtime
-        run_command(filename)
+        run_command(filename, command)
     while True:
         if filename:
             f = os.stat(filename)
             if st != f.st_mtime:
                 st = f.st_mtime
                 if filename:
-                    run_command(filename)
+                    run_command(filename, command)
         else:
             # if monitor dir
             global last_files
@@ -118,7 +118,7 @@ def monitor_file_modify_every(seconds, filename, command, dirname):
 def main():
     parser = argparse.ArgumentParser(description=help_text + " support go cpp c py")
     parser.add_argument('-f', '--filename', required=False,
-       help='if filename,watch file, else watch dir to dev web app')
+        help='if filename,watch file, else watch dir to dev web app')
     parser.add_argument(
         '-s', '--seconds', metavar='seconds', action='store',
         type=float, default=1.0, help=help_text)
@@ -127,9 +127,12 @@ def main():
         '-c', '--cmd', metavar='cmd', action='store', nargs='*',
         help="command to execute script, eg: seeing -c bash hello.sh")
     args = parser.parse_args()
+    filename = args.filename
+    for cmd in args.cmd:
+        if '.' in cmd:
+            filename = cmd
     print("Press Ctrl+c to exit")
-    monitor_file_modify_every(args.seconds, args.filename, args.cmd,
-            args.dirname)
+    monitor_file_modify_every(args.seconds, filename, args.cmd, args.dirname)
 
 if __name__ == '__main__':
     main()
