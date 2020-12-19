@@ -124,7 +124,7 @@ def main():
         type=float, default=1.0, help=help_text)
     parser.add_argument('-d', '--dirname', default='.', help='watch dirname')
     parser.add_argument(
-        '-c', '--cmd', metavar='cmd', action='store', nargs='*',
+        '-c', '--cmd', metavar='cmd', default='', nargs='*',
         help="command to execute script, eg: seeing -c bash hello.sh")
     args = parser.parse_args()
     filename = args.filename
